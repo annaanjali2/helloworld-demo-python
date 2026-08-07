@@ -66,6 +66,12 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
 
+    - name: SBOM Report Regeration with Syft
+      uses: anchore/sbom-action@v0
+      with:
+        image: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest'
+        artifact-name: sbom.spdx
+
     - name: Docker Container
       run: docker run -itd ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
 
