@@ -86,8 +86,8 @@ jobs:
 
     - name: Docker Push
       run: |
-        docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:!{{ github.sha }}
-        docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
+        docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }}
+    #   docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
     
     - name: Get Image Digest
       id: digest
