@@ -57,7 +57,7 @@ jobs:
         ignore: DL4000
 
     - name: Docker Build
-      run: docker build -t ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest .
+      run: docker build -t ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }} .
 
     - name: Docker Images
       run: docker images
@@ -65,7 +65,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@v0.36.0
       with:
-        image-ref: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest'
+        image-ref: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }}'
         format: 'table'
         exit-code: '0'
         ignore-unfixed: true
@@ -75,7 +75,7 @@ jobs:
     - name: SBOM Report Regeration with Syft
       uses: anchore/sbom-action@v0
       with:
-        image: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest'
+        image: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }}'
         artifact-name: sbom.spdx
 
     - name: Install Cosign
@@ -101,13 +101,13 @@ jobs:
       run: cosign sign --yes "${{ steps.digest.outputs.digest }}"
 
     - name: Docker Container
-      run: docker run -itd ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
+      run: docker run -itd ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }}
 
     - name: Docker Container Lists
       run: docker ps
 
-    - name: Docker Push
-      run: |
-        docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:!{{ github.sha }}
-        docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
+   # - name: Docker Push
+   #   run: |
+   #     docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:!{{ github.sha }}
+   #     docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
     
