@@ -36,13 +36,18 @@ jobs:
     - name: Code Checkout
       uses: actions/checkout@v7
       with:
-        fetch-depth: 0
+        fetch-depth: 0    
 
     - name: Login to Docker Hub
       uses: docker/login-action@v4
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Docker Linting
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
 
     - name: Docker Build
       run: docker build -t ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest .
