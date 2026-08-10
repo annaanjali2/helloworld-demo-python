@@ -106,8 +106,24 @@ jobs:
     - name: Docker Container Lists
       run: docker ps
 
-   # - name: Docker Push
-   #   run: |
-   #     docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:!{{ github.sha }}
-   #     docker push ${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:latest
-    
+  k8s-implementation:
+    needs: docker-pipeline
+    runs-on: ubuntu-latest
+    steps:
+    - name: Code Checkout
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0 
+
+    - name: start minikube
+      uses: medyagh/setup-minikube@latest        
+
+    - name: Try the Cluster
+      run: kubectl get pods -A
+
+    - name: Create Deployment and Service
+      run: |                     
+        kubectl apply -f ./k8s/deployment.yaml
+        kubectl apply -f ./k8s/service.yaml
+
+      
