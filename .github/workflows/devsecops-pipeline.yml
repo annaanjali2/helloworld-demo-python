@@ -121,6 +121,14 @@ jobs:
     - name: Try the Cluster
       run: kubectl get pods -A
 
+    - name: Kube Brnch
+      run: |
+        kubectl delete job kube-bench --ignore-not-found=true
+        kubectl apply -f https://github.com/aquasecurity/kube-bench/blob/main/job.yaml
+        kubectl wait --for=condition=complete job/kube-bench --timeout=180s
+        echo "============================== Kube-bench Results ========================="
+        kubectl logs job/kube-bench
+
     - name: Create Deployment and Service
       run: |                     
         kubectl apply -f ./k8s/deployment.yaml
