@@ -129,7 +129,7 @@ jobs:
 
     - name: Verify Deploymentt and Service
       run: |
-        kubectl get deplyments
+        kubectl get deployments
         kubectl get service
 
     - name: Test Service URL
