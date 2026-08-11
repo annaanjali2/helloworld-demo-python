@@ -33,7 +33,12 @@ jobs:
     - name: Run Snyk to check for vulnerabilities
       uses: snyk/actions/python@master
       env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}        
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+    - name: ZAP Scan
+      uses: zaproxy/action-full-scan@v0.13.0
+      with:
+        target: 'https://ginandjuice.shop/'      
 
   docker-pipeline:
     needs: devsecops-pipeline
