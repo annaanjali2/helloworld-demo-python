@@ -1,0 +1,48 @@
+name: devsecops-infra-pipeline
+on: 
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - '**/README.md'
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+  security-events: write  # Required to upload SARIF files to Security tab
+  
+jobs:
+  devsecops-infra-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Code Checkout
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        
+    - name: Secret Scanning
+      uses: gitleaks/gitleaks-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Checkov GitHub Action
+      uses: bridgecrewio/checkov-action@v12
+      with:
+        # This will add both a CLI output to the console and create a results.sarif file
+        output_format: cli,sarif
+        output_file_path: console,results.sarif
+      
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2    
+      if: success() || failure()
+      with:
+        sarif_file: results.sarif 
+
+    - name: Upload to Artifact
+      uses: actions/upload-artifact  @v7
+      with:
+        name: sarif-report
+        path: results.sarif 
+        retention-days: 30   
+        
