@@ -41,6 +41,7 @@ jobs:
 
     - name: Upload to Artifact
       uses: actions/upload-artifact@v7
+      if: success() || failure()
       with:
         name: sarif-report
         path: results.sarif 
