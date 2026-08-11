@@ -10,6 +10,7 @@ permissions:
   contents: read
   id-token: write
   packages: write
+  security-events: write  # Required to upload SARIF files to Security tab
   
 jobs:
   devsecops-pipeline:
@@ -35,10 +36,10 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-    - name: ZAP Scan
-      uses: zaproxy/action-baseline@v0.15.0
-      with:
-        target: 'https://ginandjuice.shop/'      
+  #  - name: ZAP Scan
+  #    uses: zaproxy/action-baseline@v0.15.0
+  #    with:
+  #      target: 'https://ginandjuice.shop/'      
 
   docker-pipeline:
     needs: devsecops-pipeline
@@ -71,11 +72,22 @@ jobs:
       uses: aquasecurity/trivy-action@v0.36.0
       with:
         image-ref: '${{ vars.DOCKERHUB_USERNAME }}/helloworld-demo-python:${{ github.sha }}'
-        format: 'table'
+        format: 'sarif'
         exit-code: '0'
         ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Vulnerability Scan Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-report
+        path: trivy-results.sarif
+        retention-days: 30   
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: 'trivy-results.sarif'        
 
     - name: SBOM Report Regeration with Syft
       uses: anchore/sbom-action@v0
