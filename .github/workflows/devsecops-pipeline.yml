@@ -124,7 +124,7 @@ jobs:
     - name: Kube Brnch
       run: |
         kubectl delete job kube-bench --ignore-not-found=true
-        kubectl apply -f https://github.com/aquasecurity/kube-bench/blob/main/job.yaml
+        kubectl apply -f https://raw.githubusercontent.com/aquasecurity/kube-bench/refs/heads/main/job.yaml
         kubectl wait --for=condition=complete job/kube-bench --timeout=180s
         echo "============================== Kube-bench Results ========================="
         kubectl logs job/kube-bench
